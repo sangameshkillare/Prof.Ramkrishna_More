@@ -1,0 +1,107 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Latest Updates</h2>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card card-hover">
+                <div class="card-header bg-primary text-white">
+                    Upcoming Events
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for event in events %}
+                    <li class="list-group-item">
+                        <h5>{{ event.title }}</h5>
+                        <small class="text-muted">{{ event.event_date|date:"M d, Y" }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card card-hover">
+                <div class="card-header bg-success text-white">
+                    College Notices
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for notice in notices %}
+                    <li class="list-group-item">
+                        <h5>{{ notice.title }}</h5>
+                        <small class="text-muted">{{ notice.created_at|date:"M d, Y" }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card card-hover">
+                <div class="card-header bg-info text-white">
+                    Departments
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for department in departments %}
+                    <li class="list-group-item">
+                        <a href="{% url 'department_detail' department.pk %}">
+                            {{ department.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% comment %} {% extends 'core/base.html' %}
+{% block content %}
+<h2>College Gallery</h2>
+<div class="row">
+    {% for img in gallery %}
+    <div class="col-md-3">
+        <img src="{{ img.image.url }}" class="img-fluid" alt="{{ img.title }}">
+    </div>
+    {% endfor %}
+</div>
+
+<h2>Notices</h2>
+<ul>
+    {% for notice in notices %}
+        <li>{{ notice.title }} - {{ notice.created_at }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Upcoming Events</h3>
+{% for event in events %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ event.title }}</h5>
+      <p class="card-text">{{ event.description|safe }}</p>
+      <small>{{ event.event_date|date:"M d, Y, H:i" }} at {{ event.location }}</small>
+    </div>
+  </div>
+{% endfor %}
+
+<h3>Recent Notices</h3>
+{% for notice in notices %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ notice.title }}</h5>
+      <p class="card-text">{{ notice.description|safe }}</p>
+    </div>
+  </div>
+{% endfor %}
+
+<h3>Departments</h3>
+<ul>
+  {% for dept in departments %}
+    <li>{{ dept.name }}</li>
+  {% endfor %}
+</ul>
+
+
+{% endblock %} {% endcomment %}

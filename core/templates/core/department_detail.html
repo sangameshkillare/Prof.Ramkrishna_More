@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>{{ department.name }}</h2>
+<p>{{ department.description }}</p>
+
+<h3>Notices</h3>
+{% for notice in notices %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ notice.title }}</h5>
+      <p class="card-text">{{ notice.description|safe }}</p>
+    </div>
+  </div>
+{% endfor %}
+
+<h3>Upcoming Events</h3>
+{% for event in events %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ event.title }}</h5>
+      <p class="card-text">{{ event.description|safe }}</p>
+      <small>{{ event.event_date|date:"M d, Y, H:i" }}</small>
+    </div>
+  </div>
+{% endfor %}
+
+<h2>Staff Members</h2>
+{% for staff in staff_members %}
+    <div>
+        <img src="{{ staff.image.url }}" alt="{{ staff.name }}" width="100" />
+        <h3>{{ staff.name }}</h3>
+        <p><strong>Qualification:</strong> {{ staff.qualification }}</p>
+        <p>{{ staff.description }}</p>
+        <p><em>Sub-Department: {{ staff.subdepartment.name }}</em></p>
+    </div>
+{% empty %}
+    <p>No staff listed yet.</p>
+{% endfor %}
+
+
+
+{% endblock %}

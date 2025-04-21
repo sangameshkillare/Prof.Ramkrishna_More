@@ -1,0 +1,8 @@
+body {
+    padding-bottom: 70px; /* prevent content from being hidden behind fixed footer */
+  }
+  
+  footer {
+    z-index: 999;
+  }
+  

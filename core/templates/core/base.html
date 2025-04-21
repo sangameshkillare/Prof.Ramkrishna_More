@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}College Site{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <!-- NAVBAR -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-4">
+                    <!-- Logo -->
+                    <div>
+                        <a href="{% url 'home' %}" class="flex items-center py-5 px-2 text-gray-700 hover:text-gray-900">
+                            <svg class="h-6 w-6 mr-1 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4" />
+                            </svg>
+                            <span class="font-bold">College</span>
+                        </a>
+                    </div>
+
+                    <!-- Primary Nav -->
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a class="nav-link" href="{% url 'static_page' 'vision' %}">Vision</a>
+                        <a class="nav-link" href="{% url 'static_page' 'about-us' %}">About Us</a>
+                        <a class="nav-link" href="{% url 'static_page' 'contact' %}">Contact</a>
+                        <a class="nav-link" href="{% url 'gallery' %}">Gallery</a>
+                    </div>
+                </div>
+
+                <!-- Secondary Nav -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="#" class="py-2 px-3 bg-blue-500 text-white rounded hover:bg-blue-600">Login</a>
+                </div>
+
+                <!-- Mobile Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMenu()">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'static_page' 'about-us' %}">About Us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'static_page' 'vision' %}">Vision</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'static_page' 'contact' %}">Contact</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'gallery' %}">Gallery</a>
+              </li>
+            </ul>
+          </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="p-4">
+        {% block content %}
+        <!-- Page content goes here -->
+        {% endblock %}
+    </main>
+</body>
+</html>
+
+
+{% comment %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Site</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Official website of Your College Name, featuring notices, events, and more!">
+  <meta name="keywords" content="college, events, notices, seminars, workshops, Your College Name">
+  <meta name="author" content="Your College Name">
+
+  <link href="{% static 'core/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .navbar {
+      transition: all 0.3s ease;
+    }
+    .nav-link {
+      transition: color 0.3s ease, transform 0.2s ease;
+    }
+    .nav-link:hover {
+      color: #0d6efd !important;
+      transform: scale(1.05);
+    }
+    .navbar-brand span {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="{% static 'core/images/logo.png' %}" alt="Logo" width="40" height="40" class="d-inline-block align-text-top me-2">
+        <span>Your College</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'static_page' 'about-us' %}">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'static_page' 'vision' %}">Vision</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'static_page' 'contact' %}">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'gallery' %}">Gallery</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- FOOTER -->
+  <footer class="bg-dark text-white text-center p-3 mt-5">© 2025 Your College Name</footer>
+
+  <script src="{% static 'core/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html> {% endcomment %}
