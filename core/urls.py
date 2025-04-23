@@ -56,7 +56,14 @@ urlpatterns = [
     path('sub-departments/<slug:slug>/events/', views.sub_department_events, name='sub_department_events'),
 
     # API endpoint
+    
+    path('api/staff/<int:staff_id>/', views.staff_detail_api, name='staff_detail_api'),
+
     path('api/departments-subdepartments/', views.get_departments_subdepartments, name='get_departments_subdepartments'),
+    #______________________new code and functionality
+    
+    path('api/student-development/<int:development_id>/', views.student_development_detail_api, name='student_development_detail_api'),
+    path('student-development/', views.student_development_page, name='student_development_page'),
 ]
 
 

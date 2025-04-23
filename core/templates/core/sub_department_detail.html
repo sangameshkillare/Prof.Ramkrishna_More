@@ -4,272 +4,520 @@
 {% block title %}{{ sub_department.name }} - {{ department.name }} - Departments - {% if site_settings.college_name %}{{ site_settings.college_name }}{% else %}Your College Name{% endif %}{% endblock %}
 
 {% block content %}
-  <style>
-    /* --- Base Styles --- */
-    body {
-      font-family: sans-serif;
-      line-height: 1.6;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      color: #333;
-    }
+    <style>
+        /* --- Base Styles (Keep these) --- */
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
 
-    .container {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    h1, h2, h3 {
-      color: #0056b3;
-      margin-bottom: 15px;
-    }
+        h1, h2, h3 {
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
 
-    a {
-      color: #0056b3;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
+        a {
+            color: #0056b3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
 
-    a:hover {
-      color: #003d82;
-    }
+        a:hover {
+            color: #003d82;
+        }
 
-    .btn-primary {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #0056b3;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    .btn-primary:hover {
-      background-color: #003d82;
-    }
+        .btn-primary:hover {
+            background-color: #003d82;
+        }
 
-    /* --- Page Header --- */
-    .page-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 15px;
-    }
+        /* --- Page Header (Keep these) --- */
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
 
-    .page-header img {
-      height: 70px;
-      margin-right: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+        .page-header img {
+            height: 70px;
+            margin-right: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-    .page-header h1 {
-      margin: 0;
-      font-size: 2.5em;
-    }
+        .page-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
 
-    /* --- Info Cards --- */
-    .info-card {
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-bottom: 25px;
-      border: 1px solid #eee;
-    }
+        /* --- Info Cards (Keep these) --- */
+        .info-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #eee;
+        }
 
-    .info-card h2 {
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
+        .info-card h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
 
-    .info-card ul {
-      list-style: none;
-      padding: 0;
-    }
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
 
-    .info-card li {
-      padding: 8px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
+        .info-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
 
-    .info-card li:last-child {
-      border-bottom: none;
-    }
+        .info-card li:last-child {
+            border-bottom: none;
+        }
 
-    /* --- Staff Details --- */
-    .staff-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
+        /* --- Scrollable Gallery --- */
+        .gallery-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 15px; /* To accommodate scrollbar */
+        }
 
-    .staff-member {
-      background-color: #fff;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-      padding: 20px;
-      text-align: center;
-      border: 1px solid #eee;
-    }
+        .gallery-container img {
+            width: auto; /* Adjust as needed */
+            height: 150px; /* Adjust as needed */
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+            margin-right: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
 
-    .staff-member img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 15px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
+        .gallery-container img:hover {
+            transform: scale(1.05);
+        }
 
-    .staff-member h3 {
-      margin-top: 0;
-      margin-bottom: 5px;
-      font-size: 1.2em;
-    }
+        /* --- Enhanced Staff Cards --- */
+        .staff-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 20px; /* Space for potential scrollbar */
+        }
 
-    .staff-member p {
-      margin-bottom: 8px;
-      font-size: 0.95em;
-      color: #555;
-    }
+        .staff-container .staff-member {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #eee;
+            display: inline-block;
+            width: 220px; /* Adjusted width */
+            margin-right: 15px;
+            vertical-align: top;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+        }
 
-    /* --- Gallery --- */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-    }
+        .staff-container .staff-member:hover {
+            transform: translateY(-5px); /* Slight lift on hover */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* More pronounced shadow on hover */
+        }
 
-    .gallery-grid img {
-      width: 100%;
-      border-radius: 5px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
-      transition: transform 0.3s ease-in-out;
-    }
+        .staff-container .staff-member img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-    .gallery-grid img:hover {
-      transform: scale(1.05);
-    }
+        .staff-container .staff-member h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #333;
+            overflow: hidden; /* Hide overflowing name */
+            white-space: nowrap; /* Prevent name from wrapping */
+            text-overflow: ellipsis; /* Show ellipsis for long names */
+        }
 
-    /* --- Notices and Events --- */
-    .notice-description, .event-description {
-      margin-top: 10px;
-      padding-left: 15px;
-      border-left: 2px solid #ccc;
-      font-size: 0.9em;
-      color: #666;
-    }
+        .staff-container .staff-member p {
+            margin-bottom: 8px; /* Reduced margin for better spacing */
+            font-size: 0.95em;
+            color: #555;
+            text-align: center; /* Center specialization */
+        }
 
-    /* --- Back Link --- */
-    .back-link {
-      margin-top: 30px;
-      font-size: 1em;
-    }
-  </style>
-  <h1>this is sub depaerment</h1>
+        .staff-container .staff-member strong {
+            display: block; /* Make labels like "Specialization:" appear on their own line */
+            margin-bottom: 3px; /* Add a little space below the label */
+            font-weight: bold;
+            color: #333; /* Slightly darker for emphasis */
+            text-align: center; /* Center the labels */
+        }
 
-  <div class="container">
-    <div class="page-header">
-      {% if site_settings.logo %}
-        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}">
-      {% endif %}
-      <h1>{{ sub_department.name }}</h1>
-    </div>
+        .staff-container .staff-member .view-more-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff; /* More vibrant primary color */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Add some space above the button */
+        }
 
-    {% if about_us %}
-      <div class="info-card">
-        <h2>About Us</h2>
-        {{ about_us.content|safe }}
-      </div>
-    {% endif %}
+        .staff-container .staff-member .view-more-btn:hover {
+            background-color: #0056b3;
+        }
 
-    {% if syllabi %}
-      <div class="info-card">
-        <h2>Syllabus</h2>
-        <ul>
-          {% for syllabus in syllabi %}
-            <li><a href="{{ syllabus.file.url }}" target="_blank">{{ syllabus.title }}</a> (Uploaded: {{ syllabus.uploaded_at|date:"F j, Y" }})</li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+        /* --- Attractive Staff Pop-up Styles as Form --- */
+        .staff-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Slightly darker background */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
 
-    {% if results %}
-      <div class="info-card">
-        <h2>Results</h2>
-        <ul>
-          {% for result in results %}
-            <li><a href="{{ result.file.url }}" target="_blank">{{ result.title }}</a> (Uploaded: {{ result.uploaded_at|date:"F j, Y" }})</li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+        .staff-popup.show {
+            opacity: 1;
+        }
 
-    {% if staff_members %}
-      <div class="info-card">
-        <h2>Staff Details</h2>
-        <div class="staff-list">
-          {% for staff in staff_members %}
-            <div class="staff-member">
-              {% if staff.photo %}
-                <img src="{{ staff.photo.url }}" alt="{{ staff.name }}">
-              {% endif %}
-              <h3>{{ staff.name }}</h3>
-              <p>{{ staff.designation }}</p>
-              {% if staff.email %}<p>Email: <a href="mailto:{{ staff.email }}">{{ staff.email }}</a></p>{% endif %}
-              {% if staff.phone %}<p>Phone: {{ staff.phone }}</p>{% endif %}
+        .staff-popup-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: left; /* Align text to the left for form-like appearance */
+            position: relative;
+            max-width: 700px; /* Wider pop-up for form layout */
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .staff-popup-content .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8em;
+            color: #555;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: color 0.3s ease;
+        }
+
+        .staff-popup-content .close-btn:hover {
+            color: #000;
+        }
+
+        .staff-popup-content h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #007bff; /* Primary color for heading */
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .staff-popup-content .form-group {
+            margin-bottom: 15px;
+        }
+
+        .staff-popup-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .staff-popup-content p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .staff-popup-content img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+
+    <div class="container">
+        <div class="page-header">
+            {% if site_settings.logo %}
+                <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}">
+            {% endif %}
+            <h1>{{ sub_department.name }}</h1>
+        </div>
+
+        {% if about_us %}
+            <div class="info-card">
+                <h2>About Us</h2>
+                {{ about_us.content|safe }}
             </div>
-          {% endfor %}
-        </div>
-      </div>
-    {% endif %}
+        {% endif %}
 
-    {% if gallery_images %}
-      <div class="info-card">
-        <h2>Gallery</h2>
-        <div class="gallery-grid">
-          {% for image in gallery_images %}
-            <img src="{{ image.image.url }}" alt="{{ image.title }}">
-          {% endfor %}
-        </div>
-      </div>
-    {% endif %}
+        {% if syllabi %}
+            <div class="info-card">
+                <h2>Syllabus</h2>
+                <ul>
+                    {% for syllabus in syllabi %}
+                        <li><a href="{{ syllabus.file.url }}" target="_blank">{{ syllabus.title }}</a> (Uploaded: {{ syllabus.uploaded_at|date:"F j, Y" }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
-    {% if notices %}
-      <div class="info-card">
-        <h2>Notices</h2>
-        <ul>
-          {% for notice in notices %}
-            <li>{{ notice.title }} (Uploaded: {{ notice.uploaded_at|date:"F j, Y" }})
-              <div class="notice-description">{{ notice.description|safe }}</div>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+        {% if results %}
+            <div class="info-card">
+                <h2>Results</h2>
+                <ul>
+                    {% for result in results %}
+                        <li><a href="{{ result.file.url }}" target="_blank">{{ result.title }}</a> (Uploaded: {{ result.uploaded_at|date:"F j, Y" }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
-    {% if events %}
-      <div class="info-card">
-        <h2>Events</h2>
-        <ul>
-          {% for event in events %}
-            <li>{{ event.title }} - {{ event.date|date:"F j, Y" }} {% if event.time %}{{ event.time|time:"g:i a" }}{% endif %} {% if event.location %}at {{ event.location }}{% endif %}
-              <div class="event-description">{{ event.description|safe }}</div>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+        {% if gallery_images %}
+            <div class="info-card">
+                <h2>Gallery</h2>
+                <div class="gallery-container">
+                    {% for image in gallery_images %}
+                        <img src="{{ image.image.url }}" alt="{{ image.title }}">
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
 
-    <p class="back-link"><a href="{% url 'department_detail' slug=department.slug %}">Back to {{ department.name }}</a></p>
-  </div>
-{% endblock %}
+        {% if staff_members %}
+            <div class="info-card">
+                <h2>Staff Details</h2>
+                <div class="staff-container">
+                    {% for staff in staff_members %}
+                        <div class="staff-member" data-staff-id="{{ staff.id }}">
+                            {% if staff.photo %}
+                                <img src="{{ staff.photo.url }}" alt="{{ staff.name }}">
+                            {% endif %}
+                            <h3>{{ staff.name }}</h3>
+                            {% if staff.designation %}<p>{{ staff.designation }}</p>{% endif %}
+                            {% if staff.specialization %}<p><strong>Specialization:</strong> {{ staff.specialization }}</p>{% endif %}
+                            <button class="btn-primary view-more-btn">View More</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div id="staffPopup" class="staff-popup">
+                    <div class="staff-popup-content">
+                        <button class="close-btn">&times;</button>
+                        <h2>Staff Details</h2>
+                        <img id="popupStaffPhoto" src="" alt="">
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <p id="popupStaffName"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Designation:</label>
+                            <p id="popupStaffDesignation"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Specialization:</label>
+                            <p id="popupStaffSpecialization"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Qualifications:</label>
+                            <p id="popupStaffQualifications"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <p id="popupStaffEmail"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone:</label>
+                            <p id="popupStaffPhone"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Career Summary:</label>
+                            <p id="popupStaffCareerSummary"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Mobile Numbers:</label>
+                            <p id="popupStaffMobileNumbers"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Addresses:</label>
+                            <p id="popupStaffEmailAddresses"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Courses Facilitated:</label>
+                            <p id="popupStaffCoursesFacilitated"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Research Co-Supervision:</label>
+                            <p id="popupStaffResearchCoSupervision"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Patents:</label>
+                            <p id="popupStaffPatents"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Awards & Recognition:</label>
+                            <p id="popupStaffAwardsAndRecognition"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Research Publications:</label>
+                            <p id="popupStaffResearchPublications"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Professional Activities:</label>
+                            <p id="popupStaffProfessionalActivities"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Work Experience:</label>
+                            <p id="popupStaffWorkExperience"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if notices %}
+            <div class="info-card">
+                <h2>Notices</h2>
+                <ul>
+                    {% for notice in notices %}
+                        <li>{{ notice.title }} (Uploaded: {{ notice.uploaded_at|date:"F j, Y" }})
+                            <div class="notice-description">{{ notice.description|safe }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if events %}
+            <div class="info-card">
+                <h2>Events</h2>
+                <ul>
+                    {% for event in events %}
+                        <li>{{ event.title }} - {{ event.date|date:"F j, Y" }} {% if event.time %}{{ event.time|time:"g:i a" }}{% endif %} {% if event.location %}at {{ event.location }}{% endif %}
+                            <div class="event-description">{{ event.description|safe }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <p class="back-link"><a href="{% url 'department_detail' slug=department.slug %}">Back to {{ department.name }}</a></p>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const staffMembers = document.querySelectorAll('.staff-member');
+        const staffPopup = document.getElementById('staffPopup');
+        const popupContent = staffPopup.querySelector('.staff-popup-content');
+        const closeBtn = staffPopup.querySelector('.close-btn');
+
+        staffMembers.forEach(member => {
+            const viewMoreBtn = member.querySelector('.view-more-btn');
+            viewMoreBtn.addEventListener('click', function() {
+                const staffId = this.parentNode.dataset.staffId;
+                console.log('View More clicked for staff ID:', staffId); // Debugging log
+
+                fetch(`/api/staff/${staffId}/`)
+                    .then(response => {
+                        console.log('Fetch Response:', response); // Debugging log
+                        if (!response.ok) {
+                            console.error('Fetch Error:', response.status);
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Fetched Staff Data:', data); // Debugging log
+
+                        document.getElementById('popupStaffPhoto').src = data.photo || '';
+                        document.getElementById('popupStaffPhoto').alt = data.name || '';
+                        document.getElementById('popupStaffName').textContent = data.name || '';
+                        document.getElementById('popupStaffDesignation').textContent = data.designation || '';
+                        document.getElementById('popupStaffSpecialization').textContent = data.specialization || '';
+                        document.getElementById('popupStaffQualifications').textContent = Array.isArray(data.qualifications) ? data.qualifications.join(', ') : data.qualifications || '';
+                        document.getElementById('popupStaffEmail').textContent = data.email ? `Email: ${data.email}` : '';
+                        document.getElementById('popupStaffPhone').textContent = data.phone ? `Phone: ${data.phone}` : '';
+                        document.getElementById('popupStaffCareerSummary').textContent = data.career_summary || '';
+                        document.getElementById('popupStaffMobileNumbers').textContent = Array.isArray(data.mobile_numbers) ? data.mobile_numbers.join(', ') : data.mobile_numbers || '';
+                        document.getElementById('popupStaffEmailAddresses').textContent = Array.isArray(data.email_addresses) ? data.email_addresses.join(', ') : data.email_addresses || '';
+                        
+                        document.getElementById('popupStaffResearchCoSupervision').textContent = Array.isArray(data.research_co_supervision) ? data.research_co_supervision.join(', ') : data.research_co_supervision || '';
+                        
+                        document.getElementById('popupStaffAwardsAndRecognition').textContent = Array.isArray(data.awards_and_recognition) ? data.awards_and_recognition.join(', ') : data.awards_and_recognition || '';
+                        document.getElementById('popupStaffResearchPublications').textContent = data.research_publications || '';
+                        document.getElementById('popupStaffProfessionalActivities').textContent = Array.isArray(data.professional_activities) ? data.professional_activities.join(', ') : data.professional_activities || '';
+                        document.getElementById('popupStaffWorkExperience').textContent = data.work_experience || '';
+
+                        staffPopup.style.display = 'flex';
+                        setTimeout(() => {
+                            staffPopup.classList.add('show');
+                        }, 50);
+                    })
+                    .catch(error => console.error('Error fetching staff details:', error));
+            });
+        });
+
+        closeBtn.addEventListener('click', function() {
+            staffPopup.style.display = 'none';
+            staffPopup.classList.remove('show');
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === staffPopup) {
+                staffPopup.style.display = 'none';
+                staffPopup.classList.remove('show');
+            }
+        });
+    });
+  </script>
+  {% endblock %}

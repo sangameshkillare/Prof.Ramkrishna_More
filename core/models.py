@@ -5,13 +5,11 @@ from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 
 
-
 class Department(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(max_length=255, unique=True, blank=True)
-    image = models.ImageField(upload_to='department_images/', blank=True, null=True)
+    slug = models.SlugField(unique=True)
     description = models.TextField(blank=True, null=True)
-    # ... other fields (if any)
+    image = models.ImageField(upload_to='department_images/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -21,13 +19,13 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-
 class SubDepartment(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='sub_departments')
     name = models.CharField(max_length=255)
     slug = models.SlugField()
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='sub_department_images/', blank=True, null=True)
+    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='managed_sub_departments')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -39,17 +37,16 @@ class SubDepartment(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+
 
 class AboutUs(models.Model):
-    sub_department = models.OneToOneField(SubDepartment, related_name='about_us', on_delete=models.CASCADE)
+    sub_department = models.ForeignKey(SubDepartment, on_delete=models.CASCADE)
     content = RichTextUploadingField()
 
     def __str__(self):
         return f"About Us - {self.sub_department.name}"
-    
-    
-    
+
 
 class DepartmentAdminAccess(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -116,28 +113,35 @@ class Result(models.Model):
     def __str__(self):
         return f"{self.title} - {self.sub_department.name}"
 
-
-
+from django.db import models
+from .models import Department, SubDepartment
 
 class StaffMember(models.Model):
     sub_department = models.ForeignKey(SubDepartment, related_name='staff_members', on_delete=models.SET_NULL, null=True, blank=True)
     department = models.ForeignKey(Department, related_name='staff', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    # patents = models.TextField(blank=True, null=True)
     designation = models.CharField(max_length=255)
     photo = models.ImageField(upload_to='staff_photos/', blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
-    # ... other staff details
+    specialization = models.CharField(max_length=255, blank=True, null=True)
+    career_summary = models.TextField(blank=True, null=True)
+    qualifications = models.CharField(max_length=500, blank=True, null=True)  # Added max_length
+    mobile_numbers = models.CharField(max_length=255, blank=True, null=True)  # Added max_length
+    email_addresses = models.TextField(blank=True, null=True)
+    courses_facilitated = models.CharField(max_length=500, blank=True, null=True) # Added max_length
+    research_co_supervision = models.TextField(blank=True, null=True)
+    # patents = models.TextField(blank=True, null=True)
+    awards_and_recognition = models.TextField(blank=True, null=True)
+    research_publications = models.TextField(blank=True, null=True)
+    professional_activities = models.TextField(blank=True, null=True)
+    work_experience = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
-    
-    
-    
-    
-    
-    
-    
+
+
 
 class SiteSettings(models.Model):
     college_name = models.CharField(max_length=255, default="Your College Name")
@@ -154,8 +158,8 @@ class SiteSettings(models.Model):
         if not self.pk and SiteSettings.objects.exists():
             raise Exception("Only one SiteSettings instance can exist")
         return super().save(*args, **kwargs)
-    
-    
+
+
 class Event(models.Model):
     sub_department = models.ForeignKey(SubDepartment, related_name='events', on_delete=models.CASCADE, blank=True, null=True)
     department = models.ForeignKey(Department, related_name='events', on_delete=models.CASCADE, blank=True, null=True)
@@ -168,9 +172,8 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-    
-    
-    
+
+
 class SubDepartmentAdminAccess(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     sub_department = models.ForeignKey(SubDepartment, on_delete=models.CASCADE)
@@ -180,12 +183,25 @@ class SubDepartmentAdminAccess(models.Model):
     can_manage_results = models.BooleanField(default=False)
     can_manage_staff = models.BooleanField(default=False)
 
-
     class Meta:
         verbose_name_plural = "Sub-Department Admin Access"
         unique_together = ('user', 'sub_department')
 
-
     def __str__(self):
         return f"{self.user.username} - {self.sub_department.name}"
     
+
+
+#__________________________________new pages and functionality_______________
+
+
+
+
+class StudentDevelopment(models.Model):
+    title = models.CharField(max_length=255)
+    short_description = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField()
+    # Add other relevant fields like image, date, etc.
+
+    def __str__(self):
+        return self.title

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Development - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="student-development-cards-container">
+    {% for development_item in student_development_data %}
+    <div class="student-development-card" data-development-id="{{ development_item.id }}">
+        <h4>{{ development_item.title }}</h4>
+        <p>{{ development_item.short_description|truncatewords:15 }}</p>
+        </div>
+    {% empty %}
+    <p>No student development activities available yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

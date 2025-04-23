@@ -3,19 +3,116 @@
 
 {% block content %}
   <style>
+    .department-title-container {
+      text-align: center; /* Center the "Our Departments" heading */
+      margin-bottom: 30px; /* Add some space below the title */
+    }
+
+    .department-title {
+      display: inline-block; /* Allows for potential animation on the title */
+      color: #007bff; /* A nice primary color */
+      border-bottom: 3px solid #007bff; /* Highlight the title */
+      padding-bottom: 5px;
+      font-weight: bold;
+      font-size: 2.5em;
+      letter-spacing: 0.5px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+    }
+
+    .row {
+      transition: all 0.3s ease-in-out; /* Smooth transition for the grid */
+    }
+
+    .col {
+      perspective: 1000px; /* For the 3D rotation effect */
+    }
+
     .department-card {
-      border-radius: 10px; /* Curved borders */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-      overflow: hidden; /* To contain rounded corners of image */
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+      overflow: hidden;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+      transform-style: preserve-3d; /* Enable 3D transformations */
+      backface-visibility: hidden; /* Hide back face during rotation */
+    }
+
+    .department-card:hover {
+      transform: translateY(-5px) rotateY(5deg); /* Slight lift and rotation on hover */
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Even stronger shadow on hover */
     }
 
     .department-card .card-img-top {
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
+      transition: transform 0.3s ease-in-out; /* Smooth image zoom */
+    }
+
+    .department-card:hover .card-img-top {
+      transform: scale(1.05); /* Slight zoom on image hover */
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      background-color: #f8f9fa; /* Light background for the body */
+    }
+
+    .card-title {
+      font-size: 1.5em;
+      color: #343a40; /* Darker title text */
+      margin-bottom: 10px;
+      transition: color 0.3s ease-in-out; /* Smooth title color change */
+    }
+
+    .department-card:hover .card-title {
+      color: #0056b3; /* Darker primary color on hover */
+    }
+
+    .card-text {
+      color: #6c757d; /* Muted description text */
+      font-size: 1em;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .mt-auto {
+      margin-top: auto !important; /* Push the button to the bottom */
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out; /* Button hover effects */
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+      transform: scale(1.02); /* Slight scale up on button hover */
+    }
+
+    /* Animation for the title (optional) */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .department-title-container {
+      animation: fadeInUp 0.5s ease-out;
     }
   </style>
 
-  <h1>Our Departments</h1>
+  <div class="department-title-container">
+    <h1 class="department-title">Our Departments</h1>
+  </div>
+
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     {% for department in departments %}
       <div class="col">
@@ -35,7 +132,7 @@
         </div>
       </div>
     {% empty %}
-      <p>No departments available yet.</p>
+      <p class="text-center">No departments available yet.</p>
     {% endfor %}
   </div>
 {% endblock %}

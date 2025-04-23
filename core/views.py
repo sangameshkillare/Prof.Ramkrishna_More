@@ -453,3 +453,68 @@ def sub_department_notices(request, slug):
 def sub_department_events(request, slug):
     # ... your logic for displaying events
     pass
+
+
+
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import StaffMember
+
+def staff_detail_api(request, staff_id):
+    staff = get_object_or_404(StaffMember, id=staff_id)
+    data = {
+        'id': staff.id,
+        'name': staff.name,
+        'designation': staff.designation,
+        'photo': staff.photo.url if staff.photo else '',
+        'email': staff.email,
+        'phone': staff.phone,
+        'specialization': staff.specialization,
+        'career_summary': staff.career_summary,
+        'qualifications': staff.qualifications,
+        'mobile_numbers': staff.mobile_numbers,
+        'email_addresses': staff.email_addresses,
+        'courses_facilitated': staff.courses_facilitated,
+        'research_co_supervision': staff.research_co_supervision,
+        # 'patents': staff.patents,
+        'awards_and_recognition': staff.awards_and_recognition,
+        'research_publications': staff.research_publications,
+        'professional_activities': staff.professional_activities,
+        'work_experience': staff.work_experience,
+        # Add other fields as needed
+    }
+    return JsonResponse(data)
+
+
+
+
+#______________________________new code and functionality__________________________
+
+
+# core/views.py
+from django.shortcuts import render
+from .models import StudentDevelopment
+
+def student_development_page(request):
+    student_development_data = StudentDevelopment.objects.all()  # Fetch all student development items
+    context = {'student_development_data': student_development_data}
+    return render(request, 'core/student_development.html', context)
+
+
+# core/views.py
+from django.http import JsonResponse
+
+
+def student_development_detail_api(request, development_id):
+    try:
+        development_item = StudentDevelopment.objects.get(pk=development_id)
+        data = {
+            'id': development_item.id,
+            'title': development_item.title,
+            'description': development_item.description,
+            # Add other fields you want to send
+        }
+        return JsonResponse(data)
+    except StudentDevelopment.DoesNotExist:
+        return JsonResponse({'error': 'Student development item not found'}, status=404)
