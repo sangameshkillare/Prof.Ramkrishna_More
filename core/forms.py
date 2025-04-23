@@ -1,42 +1,42 @@
 from django import forms
-from .models import Notice, GalleryImage, Syllabus, Result,StaffMember
-
-class NoticeForm(forms.ModelForm):
-    class Meta:
-        model = Notice
-        fields = ['title', 'description', 'is_college_wide', 'subdepartment']
-        widgets = {
-            'subdepartment': forms.Select(attrs={'class': 'form-control', 'required': False}),
-        }
+from .models import GalleryImage, Syllabus, Result, StaffMember, Notice, SubDepartment, GalleryCategory
 
 class GalleryImageForm(forms.ModelForm):
     class Meta:
         model = GalleryImage
-        fields = ['category', 'title', 'image', 'subdepartment']
+        fields = ['category', 'title', 'image', 'sub_department']
         widgets = {
-            'subdepartment': forms.Select(attrs={'class': 'form-control', 'required': False}),
+            'sub_department': forms.Select(attrs={'class': 'form-control', 'required': False}),
         }
 
 class SyllabusForm(forms.ModelForm):
     class Meta:
         model = Syllabus
-        fields = ['subdepartment', 'title', 'file']
+        fields = ['sub_department', 'title', 'file']
         widgets = {
-            'subdepartment': forms.Select(attrs={'class': 'form-control', 'required': False}),
+            'sub_department': forms.Select(attrs={'class': 'form-control', 'required': False}),
         }
 
 class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
-        fields = ['subdepartment', 'title', 'file']
+        fields = ['sub_department', 'title', 'file']
         widgets = {
-            'subdepartment': forms.Select(attrs={'class': 'form-control', 'required': False}),
+            'sub_department': forms.Select(attrs={'class': 'form-control', 'required': False}),
         }
 
 class StaffMemberForm(forms.ModelForm):
     class Meta:
         model = StaffMember
-        fields = ['subdepartment', 'name', 'designation', 'image', 'bio']
+        fields = ['sub_department', 'name', 'designation', 'photo', 'email', 'phone']
         widgets = {
-            'subdepartment': forms.Select(attrs={'class': 'form-control', 'required': False}),
+            'sub_department': forms.Select(attrs={'class': 'form-control', 'required': False}),
+        }
+
+class NoticeForm(forms.ModelForm):
+    class Meta:
+        model = Notice
+        fields = ['title', 'description', 'is_college_wide', 'sub_department']
+        widgets = {
+            'sub_department': forms.Select(attrs={'class': 'form-control', 'required': False}),
         }

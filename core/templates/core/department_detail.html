@@ -1,43 +1,143 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<h2>{{ department.name }}</h2>
-<p>{{ department.description }}</p>
+    <style>
+        h1 {
+            margin-bottom: 40px;
+            text-align: center;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
 
-<h3>Notices</h3>
-{% for notice in notices %}
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">{{ notice.title }}</h5>
-      <p class="card-text">{{ notice.description|safe }}</p>
+        .sub-department-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center; /* Center the row of sub-departments */
+            margin-bottom: 40px;
+        }
+
+        .sub-department-tile {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            background-color: #fff;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            width: calc(50% - 30px); /* Two sub-departments per row */
+            min-width: 350px; /* Minimum width for each tile */
+            text-align: center; /* Center the initial name */
+        }
+
+        @media (max-width: 768px) {
+            .sub-department-tile {
+                width: calc(100% - 20px); /* Single column on smaller screens */
+                min-width: auto;
+            }
+        }
+
+        .sub-department-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tile-image-container {
+            height: 220px;
+            overflow: hidden;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .tile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .sub-department-tile:hover .tile-image {
+            opacity: 0.8; /* Slightly dim the image on hover */
+        }
+
+        .tile-name-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            z-index: 10; /* Ensure it's on top of the image */
+        }
+
+        .tile-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px; /* Ensure some space for content */
+        }
+
+        .tile-title {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+
+        .tile-description {
+            font-size: 0.95em;
+            color: #555;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .view-details-button {
+            display: inline-block;
+            padding: 10px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .view-details-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <h1>{{ department.name }} - Explore Our Sub-Departments</h1>
+    <div class="sub-department-grid">
+        {% for item in animated_subdepartments %}
+            <div class="sub-department-tile" style="animation-delay: {{ item.animation_delay }}s;">
+                <div class="tile-image-container">
+                    {% if item.sub_department.image %}
+                        <img src="{{ item.sub_department.image.url }}" class="tile-image" alt="{{ item.sub_department.name }}">
+                    {% else %}
+                        <img src="{% static 'core/images/default_subdepartment.png' %}" class="tile-image" alt="Default Sub-Department Image">
+                    {% endif %}
+                    <div class="tile-name-overlay">{{ item.sub_department.name }}</div>
+                </div>
+                <div class="tile-info">
+                    <h3 class="tile-title">{{ item.sub_department.name }}</h3>
+                    {% if item.sub_department.description %}
+                        <p class="tile-description">{{ item.sub_department.description|truncatewords:20 }}</p>
+                    {% endif %}
+                    <a href="{% url 'sub_department_detail' department_slug=department.slug sub_department_slug=item.sub_department.slug %}" class="view-details-button">Learn More</a>
+                </div>
+            </div>
+        {% empty %}
+            <p>No sub-departments available for this department yet.</p>
+        {% endfor %}
     </div>
-  </div>
-{% endfor %}
-
-<h3>Upcoming Events</h3>
-{% for event in events %}
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">{{ event.title }}</h5>
-      <p class="card-text">{{ event.description|safe }}</p>
-      <small>{{ event.event_date|date:"M d, Y, H:i" }}</small>
-    </div>
-  </div>
-{% endfor %}
-
-<h2>Staff Members</h2>
-{% for staff in staff_members %}
-    <div>
-        <img src="{{ staff.image.url }}" alt="{{ staff.name }}" width="100" />
-        <h3>{{ staff.name }}</h3>
-        <p><strong>Qualification:</strong> {{ staff.qualification }}</p>
-        <p>{{ staff.description }}</p>
-        <p><em>Sub-Department: {{ staff.subdepartment.name }}</em></p>
-    </div>
-{% empty %}
-    <p>No staff listed yet.</p>
-{% endfor %}
-
-
-
 {% endblock %}

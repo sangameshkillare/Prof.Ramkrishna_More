@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,9 +41,7 @@ INSTALLED_APPS = [
     'core',
     'ckeditor',
     'ckeditor_uploader',
-
 ]
-CKEDITOR_UPLOAD_PATH = "uploads/"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,12 +55,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'college_site.urls'
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # <--- add this if not there
+        'DIRS': [BASE_DIR / 'templates'],  # Added this line
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,6 +75,7 @@ WSGI_APPLICATION = 'college_site.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -127,21 +125,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# settings.py
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For production
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'core/static'),  # Now valid after creating directory
 ]
-STATICFILES_DIRS = [BASE_DIR / 'core/static']
 
-TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -149,15 +140,13 @@ LOGOUT_REDIRECT_URL = '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'yourcollegeemail@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password'  # Use App Password, not real password
+EMAIL_HOST_USER = 'yourcollegeemail@gmail.com'  # Replace with your actual email
+EMAIL_HOST_PASSWORD = 'your_app_password'  # Replace with your email app password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 
 
 # CKEditor

@@ -1,15 +1,15 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import DepartmentAdminAccess, Notice, GalleryCategory, GalleryImage, Syllabus, Result, SubDepartment
-from .forms import NoticeForm, GalleryImageForm, SyllabusForm, ResultForm
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import SiteSettings, SubDepartment, Department, AboutUs, Syllabus, Result, StaffMember, GalleryImage, Notice, Event, GalleryCategory
+from .forms import NoticeForm, GalleryImageForm, SyllabusForm, ResultForm, StaffMemberForm
 
 
-
-
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import DepartmentAdminAccess, StaffMember, Department, SubDepartment
-from .forms import StaffMemberForm
+
+
+
+
+
 
 @login_required
 def manage_staff(request, sub_dept_id=None):
@@ -132,35 +132,24 @@ def delete_notice(request, notice_id):
         return redirect('manage_notices', sub_dept_id=sub_dept_id)
     return render(request, 'core/delete_confirm.html', {'item_type': 'notice', 'item': notice, 'cancel_url': 'manage_notices', 'sub_dept_id': sub_dept_id})
 
-# Gallery CRUD
-@login_required
+
 def manage_gallery(request, sub_dept_id=None):
-    department_access = get_object_or_404(DepartmentAdminAccess, user=request.user)
-    gallery = GalleryImage.objects.filter(department=department_access.department)
     if sub_dept_id:
-        sub_department = get_object_or_404(SubDepartment, id=sub_dept_id, department=department_access.department)
-        gallery = gallery.filter(subdepartment=sub_department)
-    return render(request, 'core/manage_gallery.html', {'gallery': gallery, 'can_add': department_access.can_manage_gallery, 'sub_dept_id': sub_dept_id})
-
-@login_required
-def add_gallery(request, sub_dept_id=None):
-    department_access = get_object_or_404(DepartmentAdminAccess, user=request.user, can_manage_gallery=True)
-    initial_data = {'department': department_access.department}
-    if sub_dept_id:
-        sub_department = get_object_or_404(SubDepartment, id=sub_dept_id, department=department_access.department)
-        initial_data['subdepartment'] = sub_department
-
-    if request.method == 'POST':
-        form = GalleryImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            gallery_image = form.save(commit=False)
-            gallery_image.department = department_access.department
-            gallery_image.subdepartment = initial_data.get('subdepartment')
-            gallery_image.save()
-            return redirect('manage_gallery', sub_dept_id=sub_dept_id)
+        sub_department = get_object_or_404(SubDepartment, pk=sub_dept_id)
+        gallery_images = GalleryImage.objects.filter(sub_department=sub_department)
     else:
-        form = GalleryImageForm(initial=initial_data)
-    return render(request, 'core/add_gallery.html', {'form': form, 'sub_dept_id': sub_dept_id})
+         gallery_images = GalleryImage.objects.all()
+         sub_department = None
+    return render(request, 'core/manage_gallery.html', {'gallery_images': gallery_images, 'sub_department':sub_department})
+
+def manage_gallery(request, sub_dept_id=None):
+    if sub_dept_id:
+        sub_department = get_object_or_404(SubDepartment, pk=sub_dept_id)
+        gallery_images = GalleryImage.objects.filter(sub_department=sub_department)
+    else:
+         gallery_images = GalleryImage.objects.all()
+         sub_department = None
+    return render(request, 'core/manage_gallery.html', {'gallery_images': gallery_images, 'sub_department':sub_department})
 
 @login_required
 def edit_gallery(request, image_id):
@@ -290,3 +279,177 @@ def delete_result(request, result_id):
         result.delete()
         return redirect('manage_results', sub_dept_id=sub_dept_id)
     return render(request, 'core/delete_confirm.html', {'item_type': 'result', 'item': result, 'cancel_url': 'manage_results', 'sub_dept_id': sub_dept_id})
+
+
+
+
+
+from .models import SiteSettings
+
+
+def home(request):
+    try:
+        site_settings = SiteSettings.objects.get()
+    except SiteSettings.DoesNotExist:
+        site_settings = None
+    return render(request, 'core/home.html', {'site_settings': site_settings})
+
+
+
+
+# Example for a department page view
+
+
+from .models import Department, SubDepartment, SiteSettings
+
+def department_detail(request, slug):
+    department = get_object_or_404(Department, slug=slug)
+    subdepartments = SubDepartment.objects.filter(department=department)
+    site_settings = None
+    try:
+        site_settings = SiteSettings.objects.get()
+    except SiteSettings.DoesNotExist:
+        site_settings = None
+    return render(request, 'core/department_detail.html', {
+        'department': department,
+        'subdepartments': subdepartments,
+        'site_settings': site_settings
+    })
+# # You'll need to do this for all your public-facing views
+
+
+from django.http import JsonResponse
+from .models import Department, SubDepartment
+from django.core import serializers
+
+def get_departments_subdepartments(request):
+    departments = Department.objects.all()
+    data = []
+    for department in departments:
+        subdepartments = SubDepartment.objects.filter(department=department)
+        data.append({
+            'id': department.id,
+            'name': department.name,
+            'slug': department.name.lower().replace(' ', '-'), # Basic slug generation
+            'subdepartments': [{'id': sub.id, 'name': sub.name, 'slug': f"{department.name.lower().replace(' ', '-')}-{sub.name.lower().replace(' ', '-')}"} for sub in subdepartments]
+        })
+    return JsonResponse(data, safe=False)
+
+
+
+
+
+from .models import SiteSettings, Department, SubDepartment
+
+
+
+def departments_overview(request):
+    departments = Department.objects.all()
+    site_settings = None
+    try:
+        site_settings = SiteSettings.objects.get()
+    except SiteSettings.DoesNotExist:
+        site_settings = None
+
+    context = {
+        'departments': departments,
+        'site_settings': site_settings,  # Make sure to pass site_settings here!
+    }
+    return render(request, 'core/departments_overview.html', context) # Adjust template name if needed
+
+
+
+def department_detail(request, slug):
+    department = get_object_or_404(Department, slug=slug)
+    subdepartments = SubDepartment.objects.filter(department=department)
+    animated_subdepartments = []
+    for index, sub_dept in enumerate(subdepartments):
+        delay = index * 0.1 + 0.2
+        animated_subdepartments.append({'sub_department': sub_dept, 'animation_delay': delay})
+    site_settings = None
+    try:
+        site_settings = SiteSettings.objects.get()
+    except SiteSettings.DoesNotExist:
+        site_settings = None
+    return render(request, 'core/department_detail.html', { # Make sure this is the correct template name
+        'department': department,
+        'animated_subdepartments': animated_subdepartments,
+        'site_settings': site_settings
+    })
+
+
+
+
+from .models import SiteSettings, SubDepartment, Department, AboutUs, Syllabus, Result, StaffMember, GalleryImage, Notice, Event
+
+
+
+def sub_department_detail(request, department_slug, sub_department_slug):
+    department = get_object_or_404(Department, slug=department_slug)
+    sub_department = get_object_or_404(SubDepartment, slug=sub_department_slug, department=department)
+    site_settings = None
+    try:
+        site_settings = SiteSettings.objects.get()
+    except SiteSettings.DoesNotExist:
+        site_settings = None
+    about_us = AboutUs.objects.filter(sub_department=sub_department).first()
+    syllabi = Syllabus.objects.filter(sub_department=sub_department).order_by('-uploaded_at')
+    results = Result.objects.filter(sub_department=sub_department).order_by('-uploaded_at')
+    staff_members = StaffMember.objects.filter(sub_department=sub_department)
+    gallery_images = GalleryImage.objects.filter(sub_department=sub_department)
+    notices = Notice.objects.filter(sub_department=sub_department).order_by('-uploaded_at')
+    events = Event.objects.filter(sub_department=sub_department).order_by('-date', 'time')
+
+    context = {
+        'department': department,
+        'sub_department': sub_department,
+        'site_settings': site_settings,
+        'about_us': about_us,
+        'syllabi': syllabi,
+        'results': results,
+        'staff_members': staff_members,
+        'gallery_images': gallery_images,
+        'notices': notices,
+        'events': events,
+    }
+    return render(request, 'core/sub_department_detail.html', context)
+
+
+
+# core/views.py
+
+from .models import SiteSettings, SubDepartment, Department
+
+def sub_department_about(request, slug):
+    try:
+        site_settings = SiteSettings.objects.get()
+    except SiteSettings.DoesNotExist:
+        site_settings = None
+    sub_department = get_object_or_404(SubDepartment, slug=slug)
+    department = sub_department.department
+    # Fetch about us content related to the sub_department
+    return render(request, 'core/sub_department_about.html', {'site_settings': site_settings, 'sub_department': sub_department, 'department': department})
+
+def sub_department_syllabus(request, slug):
+    # ... your logic for displaying syllabus
+    pass
+
+def sub_department_results(request, slug):
+    # ... your logic for displaying results
+    pass
+
+def sub_department_staff(request, slug):
+    # ... your logic for displaying staff
+    pass
+
+def sub_department_gallery(request, slug):
+    # ... your logic for displaying gallery
+    pass
+
+def sub_department_notices(request, slug):
+    # ... your logic for displaying notices
+    pass
+
+def sub_department_events(request, slug):
+    # ... your logic for displaying events
+    pass
