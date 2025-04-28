@@ -13,6 +13,14 @@ from .models import (
     AboutUs,
     Event,
 )
+
+from django.contrib import admin
+from django.contrib.admin import AdminSite
+
+# Option 1: Basic customization
+admin.site.site_header = "Prof.Ramkrishna More Admin-Portal"
+admin.site.site_title = "My Admin Portal"
+admin.site.index_title = "Welcome to My Admin Dashboard"
 from django.contrib.auth.models import User
 from django import forms
 from django.shortcuts import get_object_or_404
@@ -120,6 +128,8 @@ class DepartmentRestrictedAdmin(admin.ModelAdmin):
 
                 if self.model == Notice:
                     return qs.filter(base_filters | models.Q(department__isnull=True, sub_department__isnull=True, is_college_wide=True))
+                elif self.model == GalleryImage:
+                    return qs.filter(sub_department__department=department)
                 else:
                     return qs.filter(base_filters)
             except DepartmentAdminAccess.DoesNotExist:
@@ -134,9 +144,11 @@ class DepartmentRestrictedAdmin(admin.ModelAdmin):
                 if hasattr(obj, 'department') and obj.department and obj.department != department:
                     obj.department = department
                 elif hasattr(obj, 'sub_department') and obj.sub_department and obj.sub_department.department != department:
-                    obj.sub_department = None # Or handle this as an error
+                    obj.sub_department = None
                 elif hasattr(obj, 'is_college_wide') and not obj.department and not obj.sub_department:
-                    obj.is_college_wide = True # Default to college-wide if no specific department/sub-department
+                    obj.is_college_wide = True
+                elif hasattr(obj, 'sub_department') and obj.sub_department and not hasattr(obj, 'department'):
+                    obj.department = obj.sub_department.department
             except DepartmentAdminAccess.DoesNotExist:
                 pass
         super().save_model(request, obj, form, change)
@@ -158,8 +170,7 @@ class DepartmentRestrictedAdmin(admin.ModelAdmin):
                 access = DepartmentAdminAccess.objects.get(user=request.user)
                 department = access.department
                 return (hasattr(obj, 'department') and obj.department == department) or \
-                       (hasattr(obj, 'sub_department') and obj.sub_department and obj.sub_department.department == department) or \
-                       (hasattr(obj, 'is_college_wide') and obj.is_college_wide)
+                       (hasattr(obj, 'sub_department') and obj.sub_department and obj.sub_department.department == department)
             except DepartmentAdminAccess.DoesNotExist:
                 return False
         return self.has_add_permission(request)
@@ -191,19 +202,15 @@ class DepartmentRestrictedAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+
 @admin.register(Notice)
 class NoticeAdmin(DepartmentRestrictedAdmin):
-    fields = ['title', 'description', 'is_college_wide', 'department', 'sub_department']
-
-
-@admin.register(GalleryImage)
-class GalleryImageAdmin(DepartmentRestrictedAdmin):
-    fields = ['category', 'title', 'image', 'sub_department']
+    fields = ['title', 'description', 'is_college_wide', 'department', 'sub_department', 'pdf_upload']  # Add 'pdf_upload' here
 
 
 @admin.register(Syllabus)
 class SyllabusAdmin(DepartmentRestrictedAdmin):
-    fields = ['title', 'file', 'department', 'sub_department']
+    fields = ['title', 'file', 'pdf_upload', 'department', 'sub_department']
 
 
 @admin.register(Result)
@@ -235,6 +242,19 @@ class StaffMemberAdmin(admin.ModelAdmin):
             'fields': ('awards_and_recognition_normal', 'professional_activities_normal', 'work_experience')
         }),
     )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if not request.user.is_superuser:
+            try:
+                access = DepartmentAdminAccess.objects.get(user=request.user)
+                department = access.department
+                if db_field.name == 'department':
+                    kwargs['queryset'] = Department.objects.filter(id=department.id)
+                elif db_field.name == 'sub_department':
+                    kwargs['queryset'] = SubDepartment.objects.filter(department=department)
+            except DepartmentAdminAccess.DoesNotExist:
+                pass
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(GalleryCategory)
@@ -303,3 +323,67 @@ class EventAdmin(DepartmentRestrictedAdmin):
             except DepartmentAdminAccess.DoesNotExist:
                 pass
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(GalleryImage)
+class GalleryImageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'sub_department')  # Customize the list view in the admin panel
+    list_filter = ('category', 'sub_department')  # Add filters for easier management
+    search_fields = ('title',)  # Enable searching by title
+    
+
+
+
+#---------------------nrew pages adding
+
+
+# from .models import WebsiteAboutUs
+
+# @admin.register(WebsiteAboutUs)
+# class WebsiteAboutUsAdmin(admin.ModelAdmin):
+#     list_display = ('title',)
+#     fields = ('title', 'content')
+
+from django.contrib import admin
+from .models import AboutUsPage, MarqueeImage
+from django.utils.html import format_html
+
+@admin.register(AboutUsPage)
+class AboutUsPageAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Main Content', {
+            'fields': ('title', 'content', 'image')
+        }),
+        ('History Section', {
+            'fields': ('history_title', 'history_content'),
+            'classes': ('collapse',)
+        }),
+        ('Mission Section', {
+            'fields': ('mission_title', 'mission_content'),
+            'classes': ('collapse',)
+        }),
+        ('Vision Section', {
+            'fields': ('vision_title', 'vision_content'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def short_content_display(self, obj):
+        return obj.short_content()
+    short_content_display.short_description = 'Short Content'
+
+    readonly_fields = ('short_content_display',)
+    list_display = ('title', 'short_content_display')
+    search_fields = ('title',)  # Optional to include 'content'
+
+@admin.register(MarqueeImage)
+class MarqueeImageAdmin(admin.ModelAdmin):
+    list_display = ('admin_image', 'alt_text', 'is_active')
+    list_filter = ('is_active',)
+    readonly_fields = ('admin_image',)
+
+    def admin_image(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height: 100px; max-width: 150px; border-radius: 5px;" />', obj.image.url)
+        return 'No Image'
+    admin_image.short_description = 'Image Preview'

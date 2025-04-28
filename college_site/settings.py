@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
 ]
 
+CKEDITOR_UPLOAD_PATH = "uploads/"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -58,7 +60,7 @@ ROOT_URLCONF = 'college_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Added this line
+        'DIRS': [BASE_DIR / 'templates'],  # Corrected: Use Path object
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,7 +120,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -150,12 +151,19 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # CKEditor
-CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_UPLOAD_PATH = "uploads/"  # Where to store uploaded files
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
+        'extraPlugins': ','.join([
+            'uploadimage',  # the upload image feature
+            'widget',
+            'lineutils',
+            'clipboard',
+            'dialog',
+            'dialogui',
+        ]),
     },
 }
+CKEDITOR_LICENSE = 'AGPL'
 
-# Add to settings.py
-CKEDITOR_LICENSE = 'AGPL'  # Explicitly accept the license

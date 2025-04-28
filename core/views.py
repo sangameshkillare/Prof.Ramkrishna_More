@@ -138,18 +138,11 @@ def manage_gallery(request, sub_dept_id=None):
         sub_department = get_object_or_404(SubDepartment, pk=sub_dept_id)
         gallery_images = GalleryImage.objects.filter(sub_department=sub_department)
     else:
-         gallery_images = GalleryImage.objects.all()
-         sub_department = None
+        gallery_images = GalleryImage.objects.all()
+        sub_department = None
     return render(request, 'core/manage_gallery.html', {'gallery_images': gallery_images, 'sub_department':sub_department})
 
-def manage_gallery(request, sub_dept_id=None):
-    if sub_dept_id:
-        sub_department = get_object_or_404(SubDepartment, pk=sub_dept_id)
-        gallery_images = GalleryImage.objects.filter(sub_department=sub_department)
-    else:
-         gallery_images = GalleryImage.objects.all()
-         sub_department = None
-    return render(request, 'core/manage_gallery.html', {'gallery_images': gallery_images, 'sub_department':sub_department})
+
 
 @login_required
 def edit_gallery(request, image_id):
@@ -257,6 +250,14 @@ def add_result(request, sub_dept_id=None):
         form = ResultForm(initial=initial_data)
     return render(request, 'core/add_result.html', {'form': form, 'sub_dept_id': sub_dept_id})
 
+
+
+
+
+
+
+
+
 @login_required
 def edit_result(request, result_id):
     department_access = get_object_or_404(DepartmentAdminAccess, user=request.user, can_manage_results=True)
@@ -353,7 +354,7 @@ def departments_overview(request):
 
     context = {
         'departments': departments,
-        'site_settings': site_settings,  # Make sure to pass site_settings here!
+        'site_settings': site_settings,   # Make sure to pass site_settings here!
     }
     return render(request, 'core/departments_overview.html', context) # Adjust template name if needed
 
@@ -393,11 +394,11 @@ def sub_department_detail(request, department_slug, sub_department_slug):
     except SiteSettings.DoesNotExist:
         site_settings = None
     about_us = AboutUs.objects.filter(sub_department=sub_department).first()
-    syllabi = Syllabus.objects.filter(sub_department=sub_department).order_by('-uploaded_at')
-    results = Result.objects.filter(sub_department=sub_department).order_by('-uploaded_at')
+    syllabi = Syllabus.objects.filter(sub_department=sub_department) # Removed .order_by('-uploaded_at')
+    results = Result.objects.filter(sub_department=sub_department) # Removed .order_by('-uploaded_at')
     staff_members = StaffMember.objects.filter(sub_department=sub_department)
     gallery_images = GalleryImage.objects.filter(sub_department=sub_department)
-    notices = Notice.objects.filter(sub_department=sub_department).order_by('-uploaded_at')
+    notices = Notice.objects.filter(sub_department=sub_department).order_by('-created_at')
     events = Event.objects.filter(sub_department=sub_department).order_by('-date', 'time')
 
     context = {
@@ -497,7 +498,7 @@ from django.shortcuts import render
 from .models import StudentDevelopment
 
 def student_development_page(request):
-    student_development_data = StudentDevelopment.objects.all()  # Fetch all student development items
+    student_development_data = StudentDevelopment.objects.all()   # Fetch all student development items
     context = {'student_development_data': student_development_data}
     return render(request, 'core/student_development.html', context)
 
@@ -518,3 +519,26 @@ def student_development_detail_api(request, development_id):
         return JsonResponse(data)
     except StudentDevelopment.DoesNotExist:
         return JsonResponse({'error': 'Student development item not found'}, status=404)
+
+
+
+#---------------------new pages adding
+from django.shortcuts import render, get_object_or_404
+from .models import AboutUsPage, MarqueeImage
+
+def about_us(request):
+    """
+    View for the About Us page. Fetches content from the database.
+    Assumes only one AboutUsPage object exists.
+    """
+    # Get the first (or only) AboutUsPage instance
+    about_page = AboutUsPage.objects.first()
+
+    # Get all active marquee images
+    marquee_images = MarqueeImage.objects.filter(is_active=True)
+
+    context = {
+        'about_page': about_page,
+        'marquee_images': marquee_images,
+    }
+    return render(request, 'core/about_us.html', context)

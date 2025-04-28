@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+    <div class="container-fluid bg-light py-5">
+        <div class="container">
+            <h1 class="text-center mb-4">{{ about_page.title }}</h1>
+
+            {% if about_page.image %}
+                <div class="text-center mb-4">
+                    <img src="{{ about_page.image.url }}" alt="{{ about_page.title }}" class="img-fluid rounded shadow-lg" style="max-width: 80%; border-radius: 10px;">
+                </div>
+            {% endif %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="lead text-justify">{{ about_page.content|safe }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if about_page.history_title or about_page.history_content %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <h2>{{ about_page.history_title }}</h2>
+                <div class="text-justify">{{ about_page.history_content|safe }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if about_page.mission_title or about_page.mission_content %}
+    <div class="container-fluid bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2>{{ about_page.mission_title }}</h2>
+                    <div class="text-justify">{{ about_page.mission_content|safe }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if about_page.vision_title or about_page.vision_content %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <h2>{{ about_page.vision_title }}</h2>
+                <div class="text-justify">{{ about_page.vision_content|safe }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if marquee_images %}
+    <div class="py-4 bg-secondary">
+        <div class="marquee">
+            <div class="track">
+                {% for image in marquee_images %}
+                <div class="slide">
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" style="height: 150px; margin-right: 20px;">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <style>
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .track {
+            display: inline-flex;
+            animation: scroll 15s linear infinite;
+        }
+
+        .slide {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+{% endblock %}

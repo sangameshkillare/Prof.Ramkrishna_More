@@ -73,6 +73,7 @@
         .page-header h1 {
             margin: 0;
             font-size: 2.5em;
+            color: #333; /* Make the main page title dark */
         }
 
         /* --- Info Cards (Keep these) --- */
@@ -89,6 +90,7 @@
             border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            color: #333; /* Make the info card titles dark */
         }
 
         .info-card ul {
@@ -232,6 +234,7 @@
             max-width: 700px; /* Wider pop-up for form layout */
             max-height: 90%;
             overflow-y: auto;
+            border: 1px solid #ccc; /* Add a border to the popup content */
         }
 
         .staff-popup-content .close-btn {
@@ -253,7 +256,7 @@
         .staff-popup-content h2 {
             font-size: 1.8em;
             margin-bottom: 20px;
-            color: #007bff; /* Primary color for heading */
+            color: #333; /* Make the popup title dark */
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
             text-align: center;
@@ -261,13 +264,16 @@
 
         .staff-popup-content .form-group {
             margin-bottom: 15px;
+            border: 1px solid #ddd; /* Add border to form groups */
+            padding: 15px;
+            border-radius: 5px;
         }
 
         .staff-popup-content label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #333;
+            color: #333; /* Make the labels dark */
         }
 
         .staff-popup-content p {
@@ -285,6 +291,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+            border: 1px solid #bbb; /* Add border to the image */
         }
     </style>
 
@@ -308,7 +315,12 @@
                 <h2>Syllabus</h2>
                 <ul>
                     {% for syllabus in syllabi %}
-                        <li><a href="{{ syllabus.file.url }}" target="_blank">{{ syllabus.title }}</a> (Uploaded: {{ syllabus.uploaded_at|date:"F j, Y" }})</li>
+                        <h3>{{ syllabus.title }}</h3>
+                        <p><a href="{{ syllabus.file.url }}" target="_blank">Download Original File</a></p>
+                        {% if syllabus.pdf_upload %}
+                            <p><a href="{{ syllabus.pdf_upload.url }}" target="_blank">Download PDF</a></p>
+                        {% endif %}
+                        <hr>
                     {% endfor %}
                 </ul>
             </div>
@@ -319,7 +331,7 @@
                 <h2>Results</h2>
                 <ul>
                     {% for result in results %}
-                        <li><a href="{{ result.file.url }}" target="_blank">{{ result.title }}</a> (Uploaded: {{ result.uploaded_at|date:"F j, Y" }})</li>
+                        <li><a href="{{ result.file.url }}" target="_blank">{{ result.title }}</a> (Uploaded: {{ result.date|date:"F j, Y" }})</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -431,9 +443,12 @@
                 <h2>Notices</h2>
                 <ul>
                     {% for notice in notices %}
-                        <li>{{ notice.title }} (Uploaded: {{ notice.uploaded_at|date:"F j, Y" }})
-                            <div class="notice-description">{{ notice.description|safe }}</div>
-                        </li>
+                        <h3>{{ notice.title }}</h3>
+                        <p>{{ notice.description }}</p>
+                        {% if notice.pdf_upload %}
+                            <p><a href="{{ notice.pdf_upload.url }}" target="_blank">Download PDF</a></p>
+                        {% endif %}
+                        <hr>
                     {% endfor %}
                 </ul>
             </div>
@@ -444,80 +459,86 @@
                 <h2>Events</h2>
                 <ul>
                     {% for event in events %}
-                        <li>{{ event.title }} - {{ event.date|date:"F j, Y" }} {% if event.time %}{{ event.time|time:"g:i a" }}{% endif %} {% if event.location %}at {{ event.location }}{% endif %}
-                            <div class="event-description">{{ event.description|safe }}</div>
-                        </li>
-                    {% endfor %}
-                </ul>
+                    <li>
+                      <h2>{{ event.title }}</h2>
+                      <p>{{ event.description }}</p>
+                      {% if event.pdf_upload %}
+                        <a href="{{ event.pdf_upload.url }}" target="_blank">Open PDF</a>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
             </div>
         {% endif %}
 
         <p class="back-link"><a href="{% url 'department_detail' slug=department.slug %}">Back to {{ department.name }}</a></p>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const staffMembers = document.querySelectorAll('.staff-member');
-        const staffPopup = document.getElementById('staffPopup');
-        const popupContent = staffPopup.querySelector('.staff-popup-content');
-        const closeBtn = staffPopup.querySelector('.close-btn');
+        document.addEventListener('DOMContentLoaded', function() {
+            const staffMembers = document.querySelectorAll('.staff-member');
+            const staffPopup = document.getElementById('staffPopup');
+            const popupContent = staffPopup.querySelector('.staff-popup-content');
+            const closeBtn = staffPopup.querySelector('.close-btn');
 
-        staffMembers.forEach(member => {
-            const viewMoreBtn = member.querySelector('.view-more-btn');
-            viewMoreBtn.addEventListener('click', function() {
-                const staffId = this.parentNode.dataset.staffId;
-                console.log('View More clicked for staff ID:', staffId); // Debugging log
+            staffMembers.forEach(member => {
+                const viewMoreBtn = member.querySelector('.view-more-btn');
+                viewMoreBtn.addEventListener('click', function() {
+                    const staffId = this.parentNode.dataset.staffId;
+                    console.log('View More clicked for staff ID:', staffId); // Debugging log
 
-                fetch(`/api/staff/${staffId}/`)
-                    .then(response => {
-                        console.log('Fetch Response:', response); // Debugging log
-                        if (!response.ok) {
-                            console.error('Fetch Error:', response.status);
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Fetched Staff Data:', data); // Debugging log
+                    fetch(`/api/staff/${staffId}/`)
+                        .then(response => {
+                            console.log('Fetch Response:', response); // Debugging log
+                            if (!response.ok) {
+                                console.error('Fetch Error:', response.status);
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Fetched Staff Data:', data); // Debugging log
 
-                        document.getElementById('popupStaffPhoto').src = data.photo || '';
-                        document.getElementById('popupStaffPhoto').alt = data.name || '';
-                        document.getElementById('popupStaffName').textContent = data.name || '';
-                        document.getElementById('popupStaffDesignation').textContent = data.designation || '';
-                        document.getElementById('popupStaffSpecialization').textContent = data.specialization || '';
-                        document.getElementById('popupStaffQualifications').textContent = Array.isArray(data.qualifications) ? data.qualifications.join(', ') : data.qualifications || '';
-                        document.getElementById('popupStaffEmail').textContent = data.email ? `Email: ${data.email}` : '';
-                        document.getElementById('popupStaffPhone').textContent = data.phone ? `Phone: ${data.phone}` : '';
-                        document.getElementById('popupStaffCareerSummary').textContent = data.career_summary || '';
-                        document.getElementById('popupStaffMobileNumbers').textContent = Array.isArray(data.mobile_numbers) ? data.mobile_numbers.join(', ') : data.mobile_numbers || '';
-                        document.getElementById('popupStaffEmailAddresses').textContent = Array.isArray(data.email_addresses) ? data.email_addresses.join(', ') : data.email_addresses || '';
-                        
-                        document.getElementById('popupStaffResearchCoSupervision').textContent = Array.isArray(data.research_co_supervision) ? data.research_co_supervision.join(', ') : data.research_co_supervision || '';
-                        
-                        document.getElementById('popupStaffAwardsAndRecognition').textContent = Array.isArray(data.awards_and_recognition) ? data.awards_and_recognition.join(', ') : data.awards_and_recognition || '';
-                        document.getElementById('popupStaffResearchPublications').textContent = data.research_publications || '';
-                        document.getElementById('popupStaffProfessionalActivities').textContent = Array.isArray(data.professional_activities) ? data.professional_activities.join(', ') : data.professional_activities || '';
-                        document.getElementById('popupStaffWorkExperience').textContent = data.work_experience || '';
+                            document.getElementById('popupStaffPhoto').src = data.photo || '';
+                            document.getElementById('popupStaffPhoto').alt = data.name || '';
+                            document.getElementById('popupStaffName').textContent = data.name || '';
+                            document.getElementById('popupStaffDesignation').textContent = data.designation || '';
+                            document.getElementById('popupStaffSpecialization').textContent = data.specialization || '';
+                            document.getElementById('popupStaffQualifications').textContent = Array.isArray(data.qualifications) ? data.qualifications.join(', ') : data.qualifications || '';
+                            document.getElementById('popupStaffEmail').textContent = data.email ? `Email: ${data.email}` : '';
+                            document.getElementById('popupStaffPhone').textContent = data.phone ? `Phone: ${data.phone}` : '';
+                            document.getElementById('popupStaffCareerSummary').textContent = data.career_summary || '';
+                            document.getElementById('popupStaffMobileNumbers').textContent = Array.isArray(data.mobile_numbers) ? data.mobile_numbers.join(', ') : data.mobile_numbers || '';
+                            document.getElementById('popupStaffEmailAddresses').textContent = Array.isArray(data.email_addresses) ? data.email_addresses.join(', ') : data.email_addresses || '';
 
-                        staffPopup.style.display = 'flex';
-                        setTimeout(() => {
-                            staffPopup.classList.add('show');
-                        }, 50);
-                    })
-                    .catch(error => console.error('Error fetching staff details:', error));
+                            document.getElementById('popupStaffResearchCoSupervision').textContent = Array.isArray(data.research_co_supervision) ? data.research_co_supervision.join(', ') : data.research_co_supervision || '';
+
+                            document.getElementById('popupStaffAwardsAndRecognition').textContent = Array.isArray(data.awards_and_recognition) ? data.awards_and_recognition.join(', ') : data.awards_and_recognition || '';
+                            document.getElementById('popupStaffResearchPublications').textContent = data.research_publications || '';
+                            document.getElementById('popupStaffProfessionalActivities').textContent = Array.isArray(data.professional_activities) ? data.professional_activities.join(', ') : data.professional_activities || '';
+                            document.getElementById('popupStaffWorkExperience').textContent = data.work_experience || '';
+                            document.getElementById('popupStaffCoursesFacilitated').textContent = Array.isArray(data.courses_facilitated) ? data.courses_facilitated.join(', ') : data.courses_facilitated || '';
+                            document.getElementById('popupStaffPatents').textContent = data.patents || '';
+
+
+                            staffPopup.style.display = 'flex';
+                            setTimeout(() => {
+                                staffPopup.classList.add('show');
+                            }, 50);
+                        })
+                        .catch(error => console.error('Error fetching staff details:', error));
+                });
             });
-        });
 
-        closeBtn.addEventListener('click', function() {
-            staffPopup.style.display = 'none';
-            staffPopup.classList.remove('show');
-        });
-
-        window.addEventListener('click', function(event) {
-            if (event.target === staffPopup) {
+            closeBtn.addEventListener('click', function() {
                 staffPopup.style.display = 'none';
                 staffPopup.classList.remove('show');
-            }
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === staffPopup) {
+                    staffPopup.style.display = 'none';
+                    staffPopup.classList.remove('show');
+                }
+            });
         });
-    });
-  </script>
-  {% endblock %}
+    </script>
+{% endblock %}
